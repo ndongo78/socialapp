@@ -1,13 +1,148 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
 body {
-  margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: #282c34;
+
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+.contain {
+  display: flex;
+  flex-direction: column;
+}
+.home{
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+}
+.drawer {
+  width: 150px;
+}
+.user {
+  flex: 1.5;
+  border: 1px solid rgb(79, 75, 75);
+  border-top: 0;
+  border-bottom: 0;
+}
+.divider{
+  border-bottom: 1px solid rgb(79, 75, 75);
+  margin-top: 15px;
+}
+.input {
+  position: relative;
+}
+.search {
+  position: absolute;
+  font-size: 40px;
+  color: #ccc;
+  bottom: 10px;
+}
+.input input{
+  width: 100%;
+  height: 60px;
+  border-radius: 20px;
+  background-color: #6d6875;
+  outline: none;
+  border: 1px solid #fff;
+  text-align: center;
+}
+.chat {
+  flex:3;
+  border-top: 0;
+  border-right: 1px solid rgb(79, 75, 75); 
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.detail {
+  flex: 1;
+}
+.iconContainer{
+  /* background-color: rgb(12, 248, 170); */
+  border-radius: 50%;
+}
+.icons {
+  font-size: 60px;
+  padding: 15px;
+  color: #fff;
+  border: 1px solid #fff;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.icons:hover {
+  background-color: rgb(16, 232, 16);
+}
+
+.links{
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.chat-footer {
+ height: 100px;
+ background-color: #0f1624;
+ display: flex;
+ justify-content: center;
+ align-items: center;
+ gap: 25px;
+}
+.chat-input{
+  width: 70%;
+  height: 60px;
+  border-radius: 20px;
+  background-color: #0f1624;
+  outline: none;
+  border: .5px solid #eee;
+  font-size: 25px;
+  font-weight: 800;
+  color: #fff;
+  padding: 15px;
+}
+.iconsChat{
+  font-size: 50px;
+  padding: 15px;
+  color: #fff;
+  border: 1px solid #fff;
+  border-radius: 50%;
+  cursor: pointer;
+}
+.iconsChat:hover {
+  background-color: rgb(16, 232, 16);
+}
+
+
+
+
+
+
+/* 
+.home:nth-child(1){
+  width: 250px;
+  height: 100vh;
+  background-color: #fff;
+}
+
+.home:nth-child(2){
+  width: 600px;
+  height: 100vh;
+  background-color: rgb(142, 45, 45);
+}
+
+.home:nth-child(3){
+  width: 900px;
+  height: 100vh;
+  background-color: rgb(142, 45, 45);
+} */
