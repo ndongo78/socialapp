@@ -48,6 +48,10 @@ code {
   color: #ccc;
   bottom: 10px;
 }
+.online {
+  overflow-y: scroll;
+}
+
 .input input{
   width: 100%;
   height: 60px;
@@ -123,26 +127,3 @@ code {
   background-color: rgb(16, 232, 16);
 }
 
-
-
-
-
-
-/* 
-.home:nth-child(1){
-  width: 250px;
-  height: 100vh;
-  background-color: #fff;
-}
-
-.home:nth-child(2){
-  width: 600px;
-  height: 100vh;
-  background-color: rgb(142, 45, 45);
-}
-
-.home:nth-child(3){
-  width: 900px;
-  height: 100vh;
-  background-color: rgb(142, 45, 45);
-} */
