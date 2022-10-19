@@ -9,11 +9,21 @@ import UserProfil from "../components/UserProfil";
 import UserMessages from "../components/UserMessages";
 import CurrentChatUser from "../components/CurrentChatUser";
 import ChatInput from "../components/ChatInput";
+import { Navigate, useNavigate } from "react-router-dom";
+import { userState } from "../redux/slicers/userSlice";
+import { useEffect } from "react";
+import { useSelector } from "react-redux";
 
 const Home = () => {
-    
+    const {user,islogin }=useSelector(userState)
+    const navigate=useNavigate()
 
-
+  useEffect(() => {
+    if (!islogin) {
+      navigate("/")
+     }
+  }, [islogin])
+  
   return (
     <div className="home contain">
       <Drawer />
@@ -54,3 +64,4 @@ const Home = () => {
 };
 
 export default Home;
+

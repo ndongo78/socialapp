@@ -15,15 +15,15 @@ const Login = () => {
     password:''
   })  
     useEffect(() => {
-      if(islogin && user){
-        navigate("/")
+      if(user != null) {
+        navigate("/home")
       }
-    }, [islogin])
+    }, [user])
     
     const handleSubmit = (e:any) => {
        e.preventDefault();
        dispatch(signIn(userinfo))
-       navigate("/")
+       navigate("/home")
     }
   return (
     <div className="formContainer">

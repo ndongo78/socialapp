@@ -35,7 +35,6 @@ export const users:{id:number,name:string,avatar:string}[] = [
 const Users = () => {
  
 
-
   return (
     <>
       <h2 className=" text-white text-3xl font-bold p-3 mt-8">En ligne</h2>

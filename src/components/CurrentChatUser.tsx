@@ -1,8 +1,12 @@
 import { AiOutlineVideoCamera } from "react-icons/ai";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { IoIosCall } from "react-icons/io";
+import { useSelector } from "react-redux";
+import { conversationState } from "../redux/slicers/converMessageSlice";
 
 const CurrentChatUser = () => {
+  const {userChat} =useSelector(conversationState)
+  console.log("userChat",userChat)
   return (
     <div className=" w-full ">
       <div className="flex items-center  justify-between gap-5">
@@ -18,7 +22,7 @@ const CurrentChatUser = () => {
             alt=""
           />
           <div className="username">
-            <p className=" text-2xl font-bold text-white space-x-1">Jonh doe</p>
+            <p className=" text-2xl font-bold text-white space-x-1"> {userChat?.username} </p>
             <p></p>
           </div>
         </div>

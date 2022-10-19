@@ -8,14 +8,15 @@ const initialState:{
     isLoading:boolean
     token:string,
     receiver: any,
-    userss:any
+    userss:any,
 }={
     user:null,
     islogin:false,
     isLoading:false,
     token:"",
     receiver:null,
-    userss:[]
+    userss:[],
+    
 }
 
 export const signIn:any = createAsyncThunk(
@@ -32,7 +33,8 @@ export const getUsers:any = createAsyncThunk(
 const userSlice=createSlice({
     name:"user",
     initialState,
-    reducers:{},
+    reducers:{
+    },
     extraReducers:(builder)=>{
         builder.addCase(signIn.pending,(state,action)=>{
             console.log("loading user...");
@@ -43,6 +45,7 @@ const userSlice=createSlice({
         })
         builder.addCase(signIn.fulfilled,(state,action)=>{
             const userdec:any= jwt_decode(action.payload.token)
+            console.log(userdec);
             return {
                 ...state,
                 user: userdec.user,

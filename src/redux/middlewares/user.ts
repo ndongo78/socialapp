@@ -12,3 +12,20 @@ export const getAllUsers = async(token:string) => {
    const response=await axios.get(url+"users",{headers:{ Authorization: `Bearer ${token}`}})
    return response.data
 }
+
+export const userConversation=async(room: any,token: any) => {
+   const response=await axios.post(url+"conversations",room,{headers:{Authorization: `Bearer ${token}`}})
+   return response.data
+}
+export const getConversations = async(id:any,token:any) => {
+   const response=await axios.get(url+`conversations/${id}`,
+   {headers:{ Authorization:`Bearer ${token}`}}
+   )
+   return response.data
+}
+
+//messages
+export const createMessages=async(roomId:string,token:string) => {
+   const response=await axios.post(url+"conversations",roomId,{headers:{Authorization: `Bearer ${token}`}})
+   return response.data
+}
