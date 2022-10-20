@@ -6,10 +6,12 @@ import { conversationState } from "../redux/slicers/converMessageSlice";
 
 const CurrentChatUser = () => {
   const {userChat} =useSelector(conversationState)
-  console.log("userChat",userChat)
+  console.log("userChat",userChat);
   return (
     <div className=" w-full ">
-      <div className="flex items-center  justify-between gap-5">
+      {
+        userChat != null && (
+          <div className="flex items-center  justify-between gap-5">
         <div className=" flex gap-1 items-center">
           <img
             src="https://picsum.photos/200/300"
@@ -41,6 +43,8 @@ const CurrentChatUser = () => {
           />
         </div>
       </div>
+        )
+      }
       <div className="divider" />
     </div>
   );

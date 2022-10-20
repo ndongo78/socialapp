@@ -1,5 +1,5 @@
 import { createSlice , createAsyncThunk, AsyncThunk } from "@reduxjs/toolkit";
-import { getAllUsers, getConversations, loginUser, userConversation } from "../middlewares/user";
+import { createMessages, getAllUsers, getConversations, getMessages, loginUser, userConversation } from "../middlewares/user";
 import jwt_decode from "jwt-decode";
 
 const initialState:{
@@ -12,12 +12,12 @@ const initialState:{
     success:string,
     userChat:null
 }={
-    conversations:null,
+    conversations:[],
     islogin:false,
     isLoading:false,
     token:"",
     receiver:null,
-    messages:[],
+    messages:null,
     success:"",
     userChat:null
 }
@@ -30,7 +30,14 @@ export const currentConversation:any = createAsyncThunk(
     "getConversations",
     getConversations
 )
-
+export const currentConversationMessages:any = createAsyncThunk(
+    "currentConversationMessages",
+    getMessages
+)
+export const createConversationMessages:any = createAsyncThunk(
+    "createConversationMessages",
+    createMessages
+)
 
 
 const conversationSlice=createSlice({
@@ -43,6 +50,13 @@ const conversationSlice=createSlice({
        addConversation:(state,action)=>{
            state.conversations= action.payload
        },
+       addMessages:(state,action)=>{
+        
+        state.messages=action.payload
+    },
+    updateMsg:(state,action)=>{
+        state.messages=action.payload
+    },
     },
     extraReducers:(builder)=>{
         builder.addCase(createConversations.pending,(state,action)=>{
@@ -74,9 +88,23 @@ const conversationSlice=createSlice({
                 conversations:action.payload
             }
         });
+        builder.addCase(currentConversationMessages.fulfilled,(state,action)=>{
+            
+            return {
+                ...state,
+                messages:action.payload
+            }
+        });
+        builder.addCase(createConversationMessages.fulfilled,(state,action)=>{
+            
+            return {
+                ...state,
+                messages:action.payload
+            }
+        });
     }
 })
 
 export const conversationState=(state: { conversation: any; })=>state.conversation
-export const {addUser,addConversation} = conversationSlice.actions;
+export const {addUser,addConversation,addMessages,updateMsg} = conversationSlice.actions;
 export default conversationSlice.reducer

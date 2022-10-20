@@ -10,14 +10,12 @@ const UserMessages = () => {
   const [conversat,setConversat]=useState<any>(null)
   // console.log("users: " ,token)
   const {conversations,userChat}=useSelector(conversationState)
-  console.log("conversations: " ,conversations);
-  
+ 
   const dispatch = useDispatch()
 
   useEffect(() => {
-    if(user != null && token != null) {
-      dispatch(getUsers(token.token))
-      getConversations(user._id,token.token)
+    
+    getConversations(userChat?._id,token?.token)
       .then((data) => {
         dispatch(addConversation(data))
         setConversat(data)
@@ -25,15 +23,12 @@ const UserMessages = () => {
       .catch((error) => {
         console.log("error: ",error.response.data)
       })
-      // dispatch(currentConversation(user._id,{token:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7Il9pZCI6IjYzMjQ4MThiYWE1YjZkY2RkZGQzMzg5YyIsInVzZXJuYW1lIjoiYmlsbHkiLCJlbWFpbCI6ImJpbGx5QHlhaG9vLmNvbSIsInBhc3N3b3JkIjoiJDJiJDEwJHoxbVZPL2V3TVBZS0V2ZE1xQjRURy5YZEdGUVptcC5lQWhTa0NIaXJpb3hXWmJTSnYxR0ZpIiwicGhvbmVOdW1iZXIiOjY1ODI0MTcwMCwiaXNBZG1pbiI6ZmFsc2UsImZyaWVuZEluIjpbIjYzMjQ3ZjcyYWE1YjZkY2RkZGQzMzg4OCIsIjYzMjRhNTgyZjE2ZTdlN2FkNDNhYzVlMSJdLCJmcmllbmRPdXQiOlsiNjMyNDdmNzJhYTViNmRjZGRkZDMzODg4IiwiNjMyNGE1ODJmMTZlN2U3YWQ0M2FjNWUxIl0sImNyZWF0ZWRBdCI6IjIwMjItMDktMTZUMTQ6MDA6NDMuNzkyWiIsInVwZGF0ZWRBdCI6IjIwMjItMDktMTZUMTY6Mzk6NDAuODMwWiIsIl9fdiI6MH0sImlhdCI6MTY2NjIwNTI0NCwiZXhwIjoxNjY2MjA4ODQ0fQ.XvyReQrW7Tl1p_Uwk9HuOCZqVPXOfVoeQP0_hmBMxzQ"}))
-    }
-  }, [user,token,dispatch])
-
+   
+  }, [userChat])
+ 
   useEffect(() => {
-    if (userChat == null && userss.length != 0) {  
-      dispatch(addUser(userss[0].username))
-    }
-    }, [userChat,userss])
+    dispatch(getUsers(token.token))
+  },[token,dispatch])
 
 
   const handleSelect=(userTo:any)=>{
@@ -44,15 +39,27 @@ const UserMessages = () => {
             `${userTo._id}`
           ]
          }
-         if(conversat == null){
-         userConversation(discution,token.token)
-         .then(data=>{
-          console.log(data);
+         getConversations(userTo._id,token.token)
+         .then((data) => {
+          console.log("data",data)
+          if(data.length > 0) {
+           return dispatch(addConversation(data))
+          }else{
+            userConversation(discution,token.token)
+            .then(data=>{
+             console.log(data);
+            })
+            .catch(err=>{
+              console.log("err",err);
+            });
+          }
+       
          })
-         .catch(err=>{
-           console.log("err",err);
-         });
-        }
+         .catch((error) => {
+           console.log("error: ",error.response.data)
+         })
+
+         
   }
 
   

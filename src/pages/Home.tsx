@@ -52,7 +52,6 @@ const Home = () => {
         <CurrentChatUser />
         <div className="chat-messages">
           <Message />
-          <Message />
         </div>
         <ChatInput />
       </div>

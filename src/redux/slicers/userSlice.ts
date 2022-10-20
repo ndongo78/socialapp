@@ -37,7 +37,7 @@ const userSlice=createSlice({
     },
     extraReducers:(builder)=>{
         builder.addCase(signIn.pending,(state,action)=>{
-            console.log("loading user...");
+          
             return {
                 ...state,
                 isLoading:true,
@@ -55,7 +55,6 @@ const userSlice=createSlice({
             }
         });
         builder.addCase(signIn.rejected,(state,action)=>{
-            console.log("error user fetching user");
             return {
                 ...state,
                 user:null,
