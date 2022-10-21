@@ -41,7 +41,7 @@ const Home = () => {
           />
         </div>
         <Users />
-        <div className="messages">
+        <div className="messages sm:w-96">
           <h2 className="text-white text-3xl font-bold p-3 mt-8 mb-8">
             Messages
           </h2>

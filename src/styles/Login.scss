@@ -13,7 +13,11 @@
       flex-direction: column;
       gap: 10px;
       align-items: center;
-
+      
+      @media screen and (max-width: 900px) {
+        width: 100% ;
+      }
+      
       .logo {
         color: #5d5b8d;
         font-weight: bold;
@@ -43,6 +47,9 @@
           margin-bottom: 15px;
           &::placeholder {
             color: rgb(175, 175, 175);
+          }
+          @media screen and (max-width: 900px){
+            width: 100%;
           }
         }
   

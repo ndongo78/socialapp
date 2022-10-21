@@ -1,0 +1,31 @@
+.drawer {
+  width: 150px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  
+  @media screen and (max-width:600px){
+    position: absolute;
+    z-index: 999;
+    top: -80px;
+    display: flex;
+    flex-direction: row;
+    gap: 25px;
+    left: 50px;
+    
+    .logo{
+      display: none;
+    }
+  }
+  .links{
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  
+  
+    @media screen and (max-width:600px){
+    display: flex;
+    flex-direction: row;
+  }
+}
+}
