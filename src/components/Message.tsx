@@ -7,12 +7,11 @@ import "../styles/Message.scss";
 import { MessageChat } from "./MessageChat";
 
 const Message = () => {
-  const {conversations,userChat}=useSelector(conversationState)
+  const {conversations,userChat,messages}=useSelector(conversationState)
   const {userss,token,user}=useSelector(userState)
-  const [messages, setmessages] = useState<any>([])
+  //const [messages, setmessages] = useState<any>([])
   const [isloaded, setisloaded] = useState(false)
   // console.log(conversations)
-  console.log("messages: ",messages)
   const dispatch= useDispatch()
 
    useEffect(() => {
@@ -21,7 +20,7 @@ const Message = () => {
       getMessages(conversations[0]._id,token.token)
       .then((data:any) =>{ 
         dispatch(addMessages(data))
-        setmessages(data)
+        //setmessages(data)
         setisloaded(true)
       })
       .catch(err => console.log(err))

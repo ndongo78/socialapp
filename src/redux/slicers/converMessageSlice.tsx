@@ -1,6 +1,9 @@
 import { createSlice , createAsyncThunk, AsyncThunk } from "@reduxjs/toolkit";
 import { createMessages, getAllUsers, getConversations, getMessages, loginUser, userConversation } from "../middlewares/user";
 import jwt_decode from "jwt-decode";
+import { io } from "socket.io-client"
+
+const SERVER:string | undefined |any =process.env.REACT_APP_SOCKECT_SERVER
 
 const initialState:{
     conversations:any,
@@ -10,7 +13,8 @@ const initialState:{
     receiver: any,
     messages:any,
     success:string,
-    userChat:null
+    userChat:null,
+    serverSocket:any
 }={
     conversations:[],
     islogin:false,
@@ -19,7 +23,8 @@ const initialState:{
     receiver:null,
     messages:null,
     success:"",
-    userChat:null
+    userChat:null,
+    serverSocket:io(SERVER)
 }
 
 export const createConversations = createAsyncThunk(
@@ -55,7 +60,7 @@ const conversationSlice=createSlice({
         state.messages=action.payload
     },
     updateMsg:(state,action)=>{
-        state.messages=action.payload
+        state.messages=[...state.messages,action.payload]
     },
     },
     extraReducers:(builder)=>{

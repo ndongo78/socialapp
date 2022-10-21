@@ -11,18 +11,38 @@ import CurrentChatUser from "../components/CurrentChatUser";
 import ChatInput from "../components/ChatInput";
 import { Navigate, useNavigate } from "react-router-dom";
 import { userState } from "../redux/slicers/userSlice";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import { conversationState } from "../redux/slicers/converMessageSlice";
+import { io } from "socket.io-client"
 
+const socket=io("http://localhost:5000/")
 const Home = () => {
     const {user,islogin }=useSelector(userState)
+    const {serverSocket}=useSelector(conversationState)
     const navigate=useNavigate()
-
+    const [first, setfirst] = useState("")
+   
+    
   useEffect(() => {
     if (!islogin) {
       navigate("/")
      }
   }, [islogin])
+
+  useEffect(() => {
+    if(islogin){
+      socket.on("connection",(socketId:string)=>{
+        setfirst(socketId)
+        console.log("socketId",first);
+      })
+      socket.emit("register-new-user",user)
+      socket.on('user-connected',(users:any)=>{
+         console.log("online",users)
+      })
+    }
+  }, [islogin])
+  
   
   return (
     <div className="home contain">
@@ -41,7 +61,7 @@ const Home = () => {
           />
         </div>
         <Users />
-        <div className="messages sm:w-96">
+        <div className="messages">
           <h2 className="text-white text-3xl font-bold p-3 mt-8 mb-8">
             Messages
           </h2>
