@@ -14,7 +14,8 @@ const initialState:{
     messages:any,
     success:string,
     userChat:null,
-    serverSocket:any
+    serverSocket:any,
+    onlineUsers:any,
 }={
     conversations:[],
     islogin:false,
@@ -24,7 +25,8 @@ const initialState:{
     messages:null,
     success:"",
     userChat:null,
-    serverSocket:io(SERVER)
+    serverSocket:io(SERVER),
+    onlineUsers:[]
 }
 
 export const createConversations = createAsyncThunk(
@@ -61,6 +63,9 @@ const conversationSlice=createSlice({
     },
     updateMsg:(state,action)=>{
         state.messages=[...state.messages,action.payload]
+    },
+    getOnlineUsers:(state,action)=>{
+        state.onlineUsers=action.payload
     },
     },
     extraReducers:(builder)=>{
@@ -111,5 +116,5 @@ const conversationSlice=createSlice({
 })
 
 export const conversationState=(state: { conversation: any; })=>state.conversation
-export const {addUser,addConversation,addMessages,updateMsg} = conversationSlice.actions;
+export const {addUser,addConversation,addMessages,updateMsg,getOnlineUsers} = conversationSlice.actions;
 export default conversationSlice.reducer

@@ -12,8 +12,8 @@ import ChatInput from "../components/ChatInput";
 import { Navigate, useNavigate } from "react-router-dom";
 import { userState } from "../redux/slicers/userSlice";
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-import { conversationState } from "../redux/slicers/converMessageSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { conversationState, getOnlineUsers, updateMsg } from "../redux/slicers/converMessageSlice";
 import { io } from "socket.io-client"
 
 //const socket=io("http://localhost:5000/")
@@ -21,9 +21,13 @@ const SERVER:string | undefined |any =process.env.REACT_APP_SOCKECT_SERVER
 const socket=io(SERVER)
 const Home = () => {
     const {user,islogin }=useSelector(userState)
-    const {serverSocket}=useSelector(conversationState)
+    const {serverSocket,onlineUsers}=useSelector(conversationState)
     const navigate=useNavigate()
-    const [first, setfirst] = useState("")
+    const [newMessage, setnewMessage] = useState<any>()
+    const dispatch=useDispatch()
+
+
+    console.log("on connect",onlineUsers)
    
     
   useEffect(() => {
@@ -34,16 +38,30 @@ const Home = () => {
 
   useEffect(() => {
     if(islogin){
-      socket.on("connection",(socketId:string)=>{
-        setfirst(socketId)
-        console.log("socketId",first);
+      serverSocket.on("connectionUser",(socketId:string)=>{
+        //console.log("on connection",socketId)
+       // setfirst(socketId)
       })
-      socket.emit("register-new-user",user)
-      socket.on('user-connected',(users:any)=>{
-         console.log("online",users)
-      })
+      serverSocket.emit("register-new-user",user)
+      serverSocket.on('user-connected',(users:any)=>{
+        
+        dispatch(getOnlineUsers(users))
+     })
     }
   }, [islogin])
+
+  useEffect(() => {
+    serverSocket.on("messages",(data:any)=>{
+      updateMsg(data)
+      setnewMessage(data)
+    })
+ }, [newMessage])
+  
+ console.log("newMessage",newMessage);
+  
+ 
+  
+
   
   
   return (

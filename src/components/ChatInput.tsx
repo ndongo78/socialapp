@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BsEmojiSmile } from "react-icons/bs";
 import { RiMic2Fill } from "react-icons/ri";
 import { SiUploaded } from "react-icons/si";
@@ -9,12 +9,20 @@ import { userState } from "../redux/slicers/userSlice";
 import { createMessages } from "../redux/middlewares/user";
 
 const ChatInput = () => {  
-  const {conversations,userChat}=useSelector(conversationState)
+  const {conversations,userChat,serverSocket,onlineUsers}=useSelector(conversationState)
   const {userss,token,user}=useSelector(userState)
   const [mgs, setmgs] = useState<string>("")
+  const [recever, setrecever] = useState<any>(null)
   const dispatch = useDispatch()
+  console.log("receide",recever)
+ 
 
-  
+  useEffect(() => {
+     if(userChat) {
+      setrecever(onlineUsers.find((user:any)=>console.log("first",user)))
+     }
+  }, [recever,userChat])
+    
 
  const handleSubmit = ()=>{
   if(conversations){
@@ -22,8 +30,10 @@ const ChatInput = () => {
         conversationId:conversations[0]._id,
         senderId:user._id,
         receiverId:userChat._id,
-        content:mgs
+        content:mgs,
+        //socketId:recever.socketId
       }
+      serverSocket.emit("sendMessage",mgsTo)
       createMessages(mgsTo,token.token)
       .then(data=>{
         dispatch(updateMsg(data)) 
