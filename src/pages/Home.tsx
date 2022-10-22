@@ -16,7 +16,9 @@ import { useSelector } from "react-redux";
 import { conversationState } from "../redux/slicers/converMessageSlice";
 import { io } from "socket.io-client"
 
-const socket=io("http://localhost:5000/")
+//const socket=io("http://localhost:5000/")
+const SERVER:string | undefined |any =process.env.REACT_APP_SOCKECT_SERVER
+const socket=io(SERVER)
 const Home = () => {
     const {user,islogin }=useSelector(userState)
     const {serverSocket}=useSelector(conversationState)
