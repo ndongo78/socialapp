@@ -11,23 +11,24 @@ import CurrentChatUser from "../components/CurrentChatUser";
 import ChatInput from "../components/ChatInput";
 import { Navigate, useNavigate } from "react-router-dom";
 import { userState } from "../redux/slicers/userSlice";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { conversationState, getOnlineUsers, updateMsg } from "../redux/slicers/converMessageSlice";
 import { io } from "socket.io-client"
 
 //const socket=io("http://localhost:5000/")
 const SERVER:string | undefined |any =process.env.REACT_APP_SOCKECT_SERVER
-const socket=io(SERVER)
+
 const Home = () => {
     const {user,islogin }=useSelector(userState)
     const {serverSocket,onlineUsers}=useSelector(conversationState)
     const navigate=useNavigate()
+    const [socketId, setsocketId] = useState("")
     const [newMessage, setnewMessage] = useState<any>()
     const dispatch=useDispatch()
+    let socket=useRef<any>()
 
-
-    console.log("on connect",onlineUsers)
+   console.log("users",onlineUsers)
    
     
   useEffect(() => {
@@ -37,26 +38,33 @@ const Home = () => {
   }, [islogin])
 
   useEffect(() => {
-    if(islogin){
-      serverSocket.on("connectionUser",(socketId:string)=>{
-        //console.log("on connection",socketId)
-       // setfirst(socketId)
+     if(islogin){
+      socket.current=io(SERVER)
+      socket.current.on("connection",(data:string)=>{
+        console.log("on connection",data)
+        setsocketId(socketId)
+        socket.current.emit("register-new-user",{...user,socketId:data})
       })
-      serverSocket.emit("register-new-user",user)
-      serverSocket.on('user-connected',(users:any)=>{
+      
+      socket.current.on('user-connected',(users:any)=>{
         
         dispatch(getOnlineUsers(users))
      })
-    }
-  }, [islogin])
 
-  useEffect(() => {
-    serverSocket.on("messages",(data:any)=>{
-      updateMsg(data)
+     socket.current.on("messages",(data:any)=>{
+      console.log("messages",data)
+      dispatch(updateMsg(data)) 
       setnewMessage(data)
     })
- }, [newMessage])
-  
+    socket.current.on("disconnect",()=>{
+      socket.current.on('getUsers',(users:any)=>{
+        dispatch(getOnlineUsers(users))
+      })
+    })
+  }
+  }, [islogin])
+
+
  console.log("newMessage",newMessage);
   
  
@@ -93,7 +101,7 @@ const Home = () => {
         <div className="chat-messages">
           <Message />
         </div>
-        <ChatInput />
+        <ChatInput socket={socket.current} />
       </div>
       <div className="detail">
         <h2 className="text-white text-3xl font-bold p-3 mt-8">Historiques</h2>

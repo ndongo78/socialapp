@@ -14,8 +14,8 @@ const UserMessages = () => {
   const dispatch = useDispatch()
 
   useEffect(() => {
-    
-    getConversations(userChat?._id,token?.token)
+    if(userChat){
+      getConversations(userChat._id,token.token)
       .then((data) => {
         dispatch(addConversation(data))
         setConversat(data)
@@ -23,8 +23,8 @@ const UserMessages = () => {
       .catch((error) => {
         console.log("error: ",error.response.data)
       })
-   
-  }, [userChat])
+    }
+  }, [userChat,token])
  
   useEffect(() => {
     dispatch(getUsers(token.token))
@@ -41,15 +41,16 @@ const UserMessages = () => {
          }
          getConversations(userTo._id,token.token)
          .then((data) => {
-          console.log("data",data)
+          // console.log("data",data)
           if(data.length > 0) {
            return dispatch(addConversation(data))
           }else{
             userConversation(discution,token.token)
             .then(data=>{
-             console.log(data);
+              dispatch(addConversation(data))
             })
             .catch(err=>{
+              alert(JSON.stringify(err.response.data))
               console.log("err",err);
             });
           }

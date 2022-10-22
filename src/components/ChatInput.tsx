@@ -8,13 +8,13 @@ import { addMessages, conversationState, createConversationMessages, createConve
 import { userState } from "../redux/slicers/userSlice";
 import { createMessages } from "../redux/middlewares/user";
 
-const ChatInput = () => {  
+const ChatInput = ({socket}:any) => {  
   const {conversations,userChat,serverSocket,onlineUsers}=useSelector(conversationState)
   const {userss,token,user}=useSelector(userState)
   const [mgs, setmgs] = useState<string>("")
   const [recever, setrecever] = useState<any>(null)
   const dispatch = useDispatch()
-  console.log("receide",recever)
+  console.log(conversations)
  
 
   useEffect(() => {
@@ -27,16 +27,16 @@ const ChatInput = () => {
  const handleSubmit = ()=>{
   if(conversations){
      const mgsTo={
-        conversationId:conversations[0]._id,
+        conversationId:conversations._id,
         senderId:user._id,
         receiverId:userChat._id,
         content:mgs,
         //socketId:recever.socketId
       }
-      serverSocket.emit("sendMessage",mgsTo)
+      socket.emit("sendMessage",mgsTo)
       createMessages(mgsTo,token.token)
       .then(data=>{
-        dispatch(updateMsg(data)) 
+        //dispatch(updateMsg(data)) 
         setmgs("")
       })
       .catch(err=>{

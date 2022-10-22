@@ -17,7 +17,7 @@ const initialState:{
     serverSocket:any,
     onlineUsers:any,
 }={
-    conversations:[],
+    conversations:null,
     islogin:false,
     isLoading:false,
     token:"",
@@ -25,7 +25,7 @@ const initialState:{
     messages:null,
     success:"",
     userChat:null,
-    serverSocket:io(SERVER),
+    serverSocket:null,
     onlineUsers:[]
 }
 

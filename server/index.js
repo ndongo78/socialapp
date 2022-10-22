@@ -5,10 +5,10 @@ const cors = require("cors")
 const PORT=process.env.PORT || 5000
 let onlineUser=[]
 
-const addUser=(username,socketId)=>{
-   if(username && socketId){
+const addUser=(username)=>{
+   if(username){
   !onlineUser.some((user)=>user._id === username._id)
-  && onlineUser.push({username,socketId:socketId})
+  && onlineUser.push(username)
 }
 }
 
@@ -19,7 +19,7 @@ const removeUser = (socketId) => {
 const getUser = (userId) => {
   return onlineUser.find((user) => user.username._id === userId);
 };
-
+ 
 const app=express()
 app.use(cors())
 
@@ -35,30 +35,36 @@ const server=app.listen(PORT,()=>{
 
 const io = socket(server, {
   cors: {
-    origin: "http://localhost:3000",
+    origin: "*",
     credentials: true,
   },
 });
 
 io.on("connection",socket=>{
-  socket.emit('connectionUser',socket.id)
+  socket.emit('connection',socket.id)
+
   socket.on("register-new-user",data=>{
-    addUser(data,socket.id)
+    //console.log("object",data);
+    addUser(data)
     
     socket.emit("user-connected",onlineUser)
   })
 
   socket.on('sendMessage',(data)=>{
-    const userTo=onlineUser.find(user=>user.username._id === data.receiverId)
+    const userTo=onlineUser.find(user=>user._id === data.receiverId)
     console.log("userTo: ",userTo)
     console.log("sendMessage",data) 
     socket.to(userTo.socketId).emit('messages',data) 
   })
 
   
-  socket.on("disconnect", () => {
+  socket.on("disconnect", (data) => {
     console.log("a user disconnected!");
+     console.log(socket.id);
     removeUser(socket.id);
-    io.emit("getUsers", onlineUser);
+    socket.emit("getUsers", onlineUser);
   });
+  socket.on('error', ()=>{
+    console.log("socket error");
+  })
 })

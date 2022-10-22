@@ -6,7 +6,7 @@ import { conversationState } from "../redux/slicers/converMessageSlice";
 
 const CurrentChatUser = () => {
   const {userChat} =useSelector(conversationState)
-  console.log("userChat",userChat);
+
   return (
     <div className=" w-full ">
       {

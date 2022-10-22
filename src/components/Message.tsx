@@ -16,8 +16,8 @@ const Message = () => {
 
    useEffect(() => {
 
-    if(conversations.length > 0 && userChat){
-      getMessages(conversations[0]._id,token.token)
+    if(conversations  && userChat){
+      getMessages(conversations._id,token.token)
       .then((data:any) =>{ 
         dispatch(addMessages(data))
         //setmessages(data)
@@ -33,7 +33,7 @@ const Message = () => {
   return (
     <div className="messages">
     {
-      messages != null && userChat != null &&
+     conversations && messages != null && userChat != null &&
       messages.map((message:any, index:number) => <MessageChat message={message} />)
     }
     </div>
