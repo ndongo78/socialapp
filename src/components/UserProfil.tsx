@@ -1,6 +1,9 @@
 import { BsThreeDotsVertical } from "react-icons/bs";
+import { useSelector } from "react-redux";
+import { userState } from "../redux/slicers/userSlice";
 
 const UserProfil = () => {
+  const {userss,token,user}=useSelector(userState)
   return (
     <div className=" w-full ">
       <div className="flex items-center  justify-between gap-5">
@@ -16,7 +19,7 @@ const UserProfil = () => {
             alt=""
           />
           <div className="username">
-            <p className=" text-2xl font-bold text-white space-x-1">Jonh doe</p>
+            <p className=" text-2xl font-bold text-white space-x-1"> {user?.username} </p>
             <p>Mon compte</p>
           </div>
         </div>

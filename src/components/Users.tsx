@@ -40,7 +40,7 @@ const Users = () => {
       <h2 className=" text-white text-3xl font-bold p-3 mt-8">En ligne</h2>
       <div className="online flex gap-10 items-center">
         {users.map((user:any) => (
-          <div className="users flex flex-col items-center">
+          <div className="users flex flex-col items-center" key={user._id}>
             <img
               src={`${user.avatar}`}
               style={{

@@ -1,11 +1,15 @@
+import { useContext } from "react";
 import { AiOutlineVideoCamera } from "react-icons/ai";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { IoIosCall } from "react-icons/io";
-import { useSelector } from "react-redux";
-import { conversationState } from "../redux/slicers/converMessageSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { conversationState, setCategory } from "../redux/slicers/converMessageSlice";
+import { SocketContext } from "../redux/socket/SocketProvider";
 
 const CurrentChatUser = () => {
   const {userChat} =useSelector(conversationState)
+  const {callUser}=useContext(SocketContext)
+  const dispatch = useDispatch()
 
   return (
     <div className=" w-full ">
@@ -31,15 +35,20 @@ const CurrentChatUser = () => {
         <div className="button flex items-center">
           <AiOutlineVideoCamera
             size={55}
-            className="p-3 mr-3 border rounded-full cursor-pointer text-white"
+            className="p-3 mr-3 border rounded-full cursor-pointer text-white icons"
+            onClick={()=>{
+            dispatch(setCategory("videoCall"))
+            callUser()
+          }}
           />
           <IoIosCall
             size={55}
-            className="p-3 mr-3   border rounded-full cursor-pointer text-white"
-          />
+            className="p-3 mr-3   border rounded-full cursor-pointer text-white icons"
+            onClick={()=>dispatch(setCategory("audioCall"))}
+         />
           <BsThreeDotsVertical
             size={55}
-            className="p-3 mr-3 border rounded-full cursor-pointer text-white"
+            className="p-3 mr-3 border rounded-full cursor-pointer text-white icons"
           />
         </div>
       </div>

@@ -1,8 +1,6 @@
 import { createSlice , createAsyncThunk, AsyncThunk } from "@reduxjs/toolkit";
 import { createMessages, getAllUsers, getConversations, getMessages, loginUser, userConversation } from "../middlewares/user";
 import jwt_decode from "jwt-decode";
-import { io } from "socket.io-client"
-
 const SERVER:string | undefined |any =process.env.REACT_APP_SOCKECT_SERVER
 
 const initialState:{
@@ -16,6 +14,9 @@ const initialState:{
     userChat:null,
     serverSocket:any,
     onlineUsers:any,
+    category:string,
+    myStream:any,
+    isReceiver:boolean
 }={
     conversations:null,
     islogin:false,
@@ -26,7 +27,10 @@ const initialState:{
     success:"",
     userChat:null,
     serverSocket:null,
-    onlineUsers:[]
+    onlineUsers:[],
+    category:"",
+    myStream:null,
+    isReceiver:false
 }
 
 export const createConversations = createAsyncThunk(
@@ -67,6 +71,18 @@ const conversationSlice=createSlice({
     getOnlineUsers:(state,action)=>{
         state.onlineUsers=action.payload
     },
+    setCategory:(state,action)=>{
+        state.category=action.payload
+    },
+    getMystream:(state,action)=>{
+        state.myStream=action.payload
+    },
+    setReceiver:(state,action)=>{
+        state.isReceiver=true
+    },
+    callUser:(state,action)=>{
+
+    }
     },
     extraReducers:(builder)=>{
         builder.addCase(createConversations.pending,(state,action)=>{
@@ -116,5 +132,5 @@ const conversationSlice=createSlice({
 })
 
 export const conversationState=(state: { conversation: any; })=>state.conversation
-export const {addUser,addConversation,addMessages,updateMsg,getOnlineUsers} = conversationSlice.actions;
+export const {addUser,addConversation,addMessages,updateMsg,getOnlineUsers,setCategory,getMystream} = conversationSlice.actions;
 export default conversationSlice.reducer

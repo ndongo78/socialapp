@@ -14,7 +14,7 @@ const addUser=(username)=>{
 
 const removeUser = (socketId) => {
   onlineUser = onlineUser.filter((user) => user.socketId !== socketId);
-};
+}; 
 
 const getUser = (userId) => {
   return onlineUser.find((user) => user.username._id === userId);
@@ -44,7 +44,7 @@ io.on("connection",socket=>{
   socket.emit('connection',socket.id)
 
   socket.on("register-new-user",data=>{
-    //console.log("object",data);
+   // console.log("object",data);
     addUser(data)
     
     socket.emit("user-connected",onlineUser)
@@ -52,19 +52,30 @@ io.on("connection",socket=>{
 
   socket.on('sendMessage',(data)=>{
     const userTo=onlineUser.find(user=>user._id === data.receiverId)
-    console.log("userTo: ",userTo)
-    console.log("sendMessage",data) 
+    // console.log("userTo: ",userTo)
+    // console.log("sendMessage",data) 
     socket.to(userTo.socketId).emit('messages',data) 
   })
 
   
   socket.on("disconnect", (data) => {
     console.log("a user disconnected!");
-     console.log(socket.id);
+     //console.log(socket.id);
     removeUser(socket.id);
     socket.emit("getUsers", onlineUser);
   });
   socket.on('error', ()=>{
     console.log("socket error");
   })
+ 
+  socket.on("callUser", (data) => { 
+    const userTo=onlineUser.find(user=>user._id === data.userToCall._id)
+    //console.log("firstchar",userTo)
+    io.to(userTo.socketId).emit("callUser", { signal:data.signal, from:data.from });
+});
+
+socket.on("answerCall", (data) => {
+    console.log("signal",data);
+    io.to(data.to).emit("callAccepted", data.signal)
+});
 })

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { getConversations, userConversation } from "../redux/middlewares/user";
-import { addConversation, addUser, conversationState, createConversations, currentConversation } from "../redux/slicers/converMessageSlice";
+import { addConversation, addUser, conversationState, createConversations, currentConversation, setCategory } from "../redux/slicers/converMessageSlice";
 import { userState, getUsers } from "../redux/slicers/userSlice";
 import { users } from "./Users";
 
@@ -33,6 +33,7 @@ const UserMessages = () => {
 
   const handleSelect=(userTo:any)=>{
        dispatch(addUser(userTo)) 
+       dispatch(setCategory(""))
          const discution={
           room:[
             `${user._id}` ,
@@ -41,9 +42,9 @@ const UserMessages = () => {
          }
          getConversations(userTo._id,token.token)
          .then((data) => {
-          // console.log("data",data)
-          if(data.length > 0) {
-           return dispatch(addConversation(data))
+          console.log("data",data)
+          if(data != null) {
+           return dispatch(addConversation(data)) 
           }else{
             userConversation(discution,token.token)
             .then(data=>{
@@ -67,7 +68,7 @@ const UserMessages = () => {
   return (
     <div className="online flex gap-10 flex-col cursor-pointer">
       {userss.map((user:any) => (
-        <div className="users flex flex-row items-center justify-between hover:bg-current" onClick={()=>handleSelect(user)}>
+        <div className={`users flex flex-row items-center justify-between hover:bg-current ${user._id === userChat?._id && "bg-current" }`} onClick={()=>handleSelect(user)}>
           <div className="user-message flex flex-row items-center ">
             <img
               src={`https://picsum.photos/200/`}

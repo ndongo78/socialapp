@@ -34,6 +34,9 @@ const userSlice=createSlice({
     name:"user",
     initialState,
     reducers:{
+        setCurrentUser:(state,action) => {
+            state.user=action.payload
+        },
     },
     extraReducers:(builder)=>{
         builder.addCase(signIn.pending,(state,action)=>{
@@ -72,5 +75,5 @@ const userSlice=createSlice({
 })
 
 export const userState=(state: { user: any; })=>state.user
-
+export const {setCurrentUser}=userSlice.actions
 export default userSlice.reducer

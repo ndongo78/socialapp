@@ -7,6 +7,7 @@ import React, { ReactElement, ReactNode } from 'react';
 import Register from './pages/SignUp';
 import { useSelector } from 'react-redux';
 import { userState } from './redux/slicers/userSlice';
+import { ContextProvider } from './redux/socket/SocketProvider';
 
 function App() {
   const {user,islogin}=useSelector(userState)
@@ -18,6 +19,7 @@ function App() {
   }
   return (
     <BrowserRouter>
+      <ContextProvider>
     <Routes>
       <Route path="/" element={<Login />} />
         <Route
@@ -26,6 +28,7 @@ function App() {
         <Route path="register" element={<Register />} />
    
     </Routes>
+    </ContextProvider>
   </BrowserRouter>
   );
 }

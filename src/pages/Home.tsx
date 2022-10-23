@@ -11,24 +11,30 @@ import CurrentChatUser from "../components/CurrentChatUser";
 import ChatInput from "../components/ChatInput";
 import { Navigate, useNavigate } from "react-router-dom";
 import { userState } from "../redux/slicers/userSlice";
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { conversationState, getOnlineUsers, updateMsg } from "../redux/slicers/converMessageSlice";
+import { conversationState, getMystream, getOnlineUsers, updateMsg } from "../redux/slicers/converMessageSlice";
 import { io } from "socket.io-client"
-
+import VideoCall from "../components/VideoCall";
+import Peer from 'simple-peer';
+import { SocketContext } from "../redux/socket/SocketProvider";
+import NotificationCall from "../components/NotificationCall";
 //const socket=io("http://localhost:5000/")
 const SERVER:string | undefined |any =process.env.REACT_APP_SOCKECT_SERVER
 
 const Home = () => {
     const {user,islogin }=useSelector(userState)
-    const {serverSocket,onlineUsers}=useSelector(conversationState)
+    const {category,onlineUsers}=useSelector(conversationState)
+    const {call,callAccepted,isReceivingCall}=useContext(SocketContext)
     const navigate=useNavigate()
     const [socketId, setsocketId] = useState("")
     const [newMessage, setnewMessage] = useState<any>()
     const dispatch=useDispatch()
     let socket=useRef<any>()
 
-   console.log("users",onlineUsers)
+   
+
+   
    
     
   useEffect(() => {
@@ -37,44 +43,38 @@ const Home = () => {
      }
   }, [islogin])
 
-  useEffect(() => {
-     if(islogin){
-      socket.current=io(SERVER)
-      socket.current.on("connection",(data:string)=>{
-        console.log("on connection",data)
-        setsocketId(socketId)
-        socket.current.emit("register-new-user",{...user,socketId:data})
-      })
-      
-      socket.current.on('user-connected',(users:any)=>{
-        
-        dispatch(getOnlineUsers(users))
-     })
+  // useEffect(()=>{
+  //   if(isReceivingCall){
+  //     alert("vous avez recu un appel")
+  //   }
+  // },[isReceivingCall])
 
-     socket.current.on("messages",(data:any)=>{
-      console.log("messages",data)
-      dispatch(updateMsg(data)) 
-      setnewMessage(data)
-    })
-    socket.current.on("disconnect",()=>{
-      socket.current.on('getUsers',(users:any)=>{
-        dispatch(getOnlineUsers(users))
-      })
-    })
-  }
-  }, [islogin])
 
 
  console.log("newMessage",newMessage);
   
+ const displayComponent=()=>{
+   if(category ==="audioCall"){
+    return <Message />
+   }else if(category ==="videoCall"){
+    return <VideoCall  />
+   }else{
+    return <Message />
+   }
+ }
  
   
 
   
   
   return (
+    <>
+    {
+      isReceivingCall &&
+    <NotificationCall />
+    }
     <div className="home contain">
-      <Drawer />
+      {/* <Drawer /> */}
       <div className="user">
         <div className="profile flex items-center justify-between">
           <UserProfil />
@@ -99,14 +99,18 @@ const Home = () => {
       <div className="chat">
         <CurrentChatUser />
         <div className="chat-messages">
-          <Message />
+          {displayComponent()}
         </div>
-        <ChatInput socket={socket.current} />
+        {
+          category ==="" &&
+        <ChatInput  />
+        }
       </div>
       <div className="detail">
         <h2 className="text-white text-3xl font-bold p-3 mt-8">Historiques</h2>
       </div>
     </div>
+    </>
   );
 };
 

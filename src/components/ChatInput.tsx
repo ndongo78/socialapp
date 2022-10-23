@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { BsEmojiSmile } from "react-icons/bs";
 import { RiMic2Fill } from "react-icons/ri";
 import { SiUploaded } from "react-icons/si";
@@ -7,14 +7,15 @@ import { useDispatch, useSelector } from "react-redux";
 import { addMessages, conversationState, createConversationMessages, createConversations, updateMsg } from "../redux/slicers/converMessageSlice";
 import { userState } from "../redux/slicers/userSlice";
 import { createMessages } from "../redux/middlewares/user";
+import { SocketContext } from "../redux/socket/SocketProvider";
 
-const ChatInput = ({socket}:any) => {  
+const ChatInput = () => {  
+  const {handleSubmit,mgs,setmgs}=useContext(SocketContext)
   const {conversations,userChat,serverSocket,onlineUsers}=useSelector(conversationState)
   const {userss,token,user}=useSelector(userState)
-  const [mgs, setmgs] = useState<string>("")
   const [recever, setrecever] = useState<any>(null)
   const dispatch = useDispatch()
-  console.log(conversations)
+  
  
 
   useEffect(() => {
@@ -24,28 +25,7 @@ const ChatInput = ({socket}:any) => {
   }, [recever,userChat])
     
 
- const handleSubmit = ()=>{
-  if(conversations){
-     const mgsTo={
-        conversationId:conversations._id,
-        senderId:user._id,
-        receiverId:userChat._id,
-        content:mgs,
-        //socketId:recever.socketId
-      }
-      socket.emit("sendMessage",mgsTo)
-      createMessages(mgsTo,token.token)
-      .then(data=>{
-        //dispatch(updateMsg(data)) 
-        setmgs("")
-      })
-      .catch(err=>{
-        console.log(err)
-      })
-  }
-     
-      
- }
+
 
   return (
     <div className="chat-footer bg-slate-800 w-full">
