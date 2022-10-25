@@ -163,7 +163,7 @@ const ContextProvider = ({ children }:any) => {
         setisReceivingCall(false)
        await navigator.mediaDevices.getUserMedia({ video: true, audio: true })
         .then((currentStream) => {
-          myVideo.current.srcObject = currentStream;
+         // myVideo.current.srcObject = currentStream;
             //setStream(currentStream);
             peer.current.on("call",call=>{
               call.answer(currentStream)
