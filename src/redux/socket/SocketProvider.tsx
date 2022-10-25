@@ -158,10 +158,10 @@ const ContextProvider = ({ children }:any) => {
         
     // }, []);
 
-    const answerCall = () => {
+    const answerCall = async() => {
         setCallAccepted(true);
         setisReceivingCall(false)
-        navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+       await navigator.mediaDevices.getUserMedia({ video: true, audio: true })
         .then((currentStream) => {
           myVideo.current.srcObject = currentStream;
             //setStream(currentStream);
@@ -200,9 +200,9 @@ const ContextProvider = ({ children }:any) => {
       // return  connectionRef.current = peer;
     };
 
-    const callUser = () => {
+    const callUser = async() => {
       
-         navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+        await navigator.mediaDevices.getUserMedia({ video: true, audio: true })
          .then((currentStream) => {
           myVideo.current.srcObject = currentStream;
           const remoteUser=onlineUsers.find((user: { _id: string; }) => user._id ===userChat._id);

@@ -42,11 +42,11 @@ const VideoCall = () => {
   </div>
   {
   myVideo &&
-  <video playsInline muted ref={myVideo}  autoPlay className="video" />
+  <video playsInline  ref={myVideo}  autoPlay className="video" />
   }
   {
     callAccepted && !callEnded &&
-    <video playsInline muted ref={userVideo}  autoPlay className="video" />
+    <video playsInline  ref={userVideo}  autoPlay className="video" />
   }
   <div className="btn-container">
     <ImPhoneHangUp size={50}/>
