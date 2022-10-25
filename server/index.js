@@ -38,13 +38,13 @@ const io = socket(server, {
     origin: "*",
     credentials: true,
   },
-});
+}); 
 
 io.on("connection",socket=>{
   socket.emit('connection',socket.id)
 
   socket.on("register-new-user",data=>{
-   // console.log("object",data);
+    console.log("object",data);
     addUser(data)
     
     socket.emit("user-connected",onlineUser)
@@ -74,7 +74,7 @@ io.on("connection",socket=>{
     io.to(userTo.socketId).emit("callUser", { signal:data.signal, from:data.from });
 });
 
-socket.on("answerCall", (data) => {
+socket.on("answerCall", (data) => { 
     console.log("signal",data);
     io.to(data.to).emit("callAccepted", data.signal)
 });

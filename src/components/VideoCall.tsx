@@ -16,21 +16,20 @@ const VideoCall = () => {
     //  console.log("conversations",conversations.room[0]._id)
       console.log("userch",stream)
    
-    useEffect(() => {
-        navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-        .then((currentStream) => {
-           setStream(currentStream);
-            dispatch(getMystream(currentStream))
-            myVideo.current.srcObject = currentStream;
-        });
-       }, [myVideo])
+    // useEffect(() => {
+    //     navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+    //     .then((currentStream) => {
+    //        setStream(currentStream);
+    //         dispatch(getMystream(currentStream))
+    //         myVideo.current.srcObject = currentStream;
+    //     });
+    //    }, [myVideo])
 
     //  useEffect(()=>{
     //     const isIn=conversations.room.some((user:any)=> user._id==userChat._id)
     //     setisIn(isIn)
     //  },[conversations,userChat])
      
-   console.log("myVideo",myVideo);
 
    
   return (

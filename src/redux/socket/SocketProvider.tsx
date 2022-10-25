@@ -1,6 +1,6 @@
 import React, { createContext, useState, useRef, useEffect } from 'react';
 import { io } from 'socket.io-client';
-import Peer from 'simple-peer';
+import Peer from 'peerjs';
 import { useDispatch, useSelector } from 'react-redux';
 import { setCurrentUser, userState } from '../slicers/userSlice';
 import { conversationState, getOnlineUsers, updateMsg } from '../slicers/converMessageSlice';
@@ -44,12 +44,14 @@ const initialState={
 
 const SocketContext = createContext(initialState);
 
+
+
 // const socket = io('http://localhost:5000');
 
 
 const ContextProvider = ({ children }:any) => {
     const {user,islogin,token}=useSelector(userState)
-    const {conversations,userChat}=useSelector(conversationState)
+    const {conversations,userChat,onlineUsers}=useSelector(conversationState)
      
     const [mgs, setmgs] = useState<string>("")
     const [callAccepted, setCallAccepted] = useState<boolean>(false);
@@ -80,22 +82,47 @@ const ContextProvider = ({ children }:any) => {
     const userVideo = useRef<any>();
     const connectionRef = useRef<any>();
     let socket=useRef<any>()
+    let peer=useRef<any>()
 
     const dispatch = useDispatch()
 
     useEffect(() => {
         if(islogin){
+           peer.current = new Peer( {
+            path: '/',
+            //host: "192.168.1.12",
+           // host:"https://chabackendapi.herokuapp.comnnn",
+            //port:5000,
+            secure: true,
+            config: {
+              iceServers: [
+                {
+                  urls: [
+                    'stun:stun1.l.google.com:19302',
+                    'stun:stun2.l.google.com:19302',
+                  ],
+                },
+              ],
+            },
+          });
          socket.current=io(SERVER)
          socket.current.on("connection",(data:string)=>{
            console.log("on connection",data)
            setsocketId(socketId)
-           dispatch(setCurrentUser({...user,socketId:data}))
-           socket.current.emit("register-new-user",{...user,socketId:data})
+           peer.current.on('open', (peerId: string) => {
+         console.log("peerid",peerId);
+          dispatch(setCurrentUser({...user,socketId:data,peerId:peerId}))
+           socket.current.emit("register-new-user",{...user,socketId:data,peerId:peerId})
+        });
+           
          })
          
          socket.current.on('user-connected',(users:any)=>{
            dispatch(getOnlineUsers(users))
         })
+        peer.current.on('error', (err: Error) =>
+          console.log('Peer server error', err),
+        );
    
         socket.current.on("messages",(data:any)=>{
          console.log("messages",data)
@@ -120,43 +147,90 @@ const ContextProvider = ({ children }:any) => {
 
    
 
-    useEffect(() => {
-        navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-            .then((currentStream) => {
-                setStream(currentStream);
+    // useEffect(() => {
+        // navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+        //     .then((currentStream) => {
+        //         setStream(currentStream);
 
-                myVideo.current.srcObject = currentStream;
-            });
+        //         myVideo.current.srcObject = currentStream;
+        //     });
 
         
-    }, []);
+    // }, []);
 
     const answerCall = () => {
         setCallAccepted(true);
         setisReceivingCall(false)
+        navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+        .then((currentStream) => {
+          myVideo.current.srcObject = currentStream;
+            //setStream(currentStream);
+            peer.current.on("call",call=>{
+              call.answer(currentStream)
+              try {
+                call.on("stream",remoteStream=>{
+                  userVideo.current.srcObject=remoteStream
+                })
+              } catch (error) {
+                console.log("call error", error);
+               return alert("Error calling")
+              }
+            })
+
+        });
+        
+        //const peer = new Peer({ initiator: true, stream:stream });
         //console.log("stream received",stream);
-        const peer = new Peer({ initiator: false, stream:stream });
+      //   peer.on('error', (error) => {
+          
+      //     console.error('peer error', error)
+      //   })
+      //   peer.on('signal', (data) => {
+      //       //console.log("stream received data",data);
+      //       socket.current.emit('answerCall', { signal: data, to: call.from });
+      //   });
+      //   console.log("stream received","avva")
+      //   peer.on('stream', (currentStream) => {
+      //    console.log("stream received",currentStream)
+      //       userVideo.current.srcObject = currentStream;
+      //   }); 
+      //   peer.signal(call.signal);
+      //   console.log(call);
 
-        peer.on('signal', (data) => {
-            
-            socket.current.emit('answerCall', { signal: data, to: call.from });
-        });
-
-        peer.on('stream', (currentStream) => {
-            userVideo.current.srcObject = currentStream;
-        });
-        console.log(call);
-        peer.signal(call.signal);
-
-      return  connectionRef.current = peer;
+      // return  connectionRef.current = peer;
     };
 
     const callUser = () => {
-        const peer = new Peer({ initiator: true, trickle: false, stream });
-        peer.on('signal', (data) => {
-            console.log("signal", data);
-            socket.current.emit('callUser', { userToCall: userChat, signalData: data, from: user });
-        });
+      
+         navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+         .then((currentStream) => {
+          myVideo.current.srcObject = currentStream;
+          const remoteUser=onlineUsers.find((user: { _id: string; }) => user._id ===userChat._id);
+
+         if(remoteUser && !remoteUser.peerId){
+         return alert(`${userChat.username} n'est pas connecter`)
+         }
+             //setStream(currentStream);
+             socket.current.emit('callUser', { userToCall: remoteUser,from: user });
+             var call=peer.current.call(remoteUser.peerId,currentStream)
+             try {
+              call.on("stream",(remoteStream)=>{
+                userVideo.current.srcObject=remoteStream
+              })
+             } catch (error) {
+              console.log("call failed", error)
+              return alert("Une erreur est survenue")
+             }
+
+            //  myVideo.current.srcObject = currentStream;
+         });
+        
+        
+         // const peer = new Peer({ initiator: true, trickle: false, stream });
+        // peer.on('signal', (data) => {
+        //     console.log("signal", data);
+        //     socket.current.emit('callUser', { userToCall: userChat, signalData: data, from: user });
+        // });
         // peer.on('stream', (currentStream) => {
         //     userVideo.current.srcObject = currentStream;
         // });
