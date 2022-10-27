@@ -34,7 +34,7 @@ const VideoCall = () => {
           myVideo.current.srcObject = mediaStream;
       }).catch(err => console.log("err: ", err));
       
-    }, [myVideo])
+    }, [])
     const answerCall = () => {
       setisReceivingCall(false)
       dispatch(setCallAccept())
@@ -68,17 +68,18 @@ const VideoCall = () => {
     <p>Appel en cour</p>
   </div>
   <div className=' flex'>
-  {
-    mystream &&
-  <video playsInline  ref={myVideo}  autoPlay className="video" />
-  }
-   
-   <div className=' bg-yellow-50'>
+    <div className=" bg-red-500">
     {
-      callAccepted && !callEnded &&
-    <video playsInline  ref={userVideo}  autoPlay className="video" />
+    myVideo &&
+    <video playsInline  ref={myVideo}  autoPlay className="video" />
     }
+    </div>
+   {
+      callAccepted && !callEnded &&
+   <div className=' bg-yellow-50'>
+    <video playsInline  ref={userVideo}  autoPlay className="video" />
    </div>
+   }
   </div>
   
   

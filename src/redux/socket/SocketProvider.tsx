@@ -93,16 +93,16 @@ const ContextProvider = ({ children }:any) => {
     const dispatch = useDispatch()
 
 
-    // useEffect(() => {
-    //   navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-    //   .then((mediaStream) => {
-    //      // console.log("currentStream",mediaStream)
-    //       setMyStream(mediaStream);
-    //       myVideo.current.srcObject = mediaStream;
+    useEffect(() => {
+      navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+      .then((mediaStream) => {
+         // console.log("currentStream",mediaStream)
+          setMyStream(mediaStream);
+          myVideo.current.srcObject = mediaStream;
           
-    //   }).catch(err => console.log("err: ", err));
+      }).catch(err => console.log("err: ", err));
      
-    // }, [])
+    }, [])
     
     useEffect(() => {
         if(islogin){
@@ -196,7 +196,6 @@ const ContextProvider = ({ children }:any) => {
 
           peer.signal(signal);
       });
-
       connectionRef.current = peer;
   };
 
