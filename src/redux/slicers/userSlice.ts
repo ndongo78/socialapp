@@ -9,6 +9,7 @@ const initialState:{
     token:string,
     receiver: any,
     userss:any,
+    acceptedCall:boolean
 }={
     user:null,
     islogin:false,
@@ -16,6 +17,7 @@ const initialState:{
     token:"",
     receiver:null,
     userss:[],
+    acceptedCall:false
     
 }
 
@@ -37,6 +39,9 @@ const userSlice=createSlice({
         setCurrentUser:(state,action) => {
             state.user=action.payload
         },
+        setCallAccept: (state)=>{
+            state.acceptedCall=true
+        }
     },
     extraReducers:(builder)=>{
         builder.addCase(signIn.pending,(state,action)=>{
@@ -75,5 +80,5 @@ const userSlice=createSlice({
 })
 
 export const userState=(state: { user: any; })=>state.user
-export const {setCurrentUser}=userSlice.actions
+export const {setCurrentUser,setCallAccept}=userSlice.actions
 export default userSlice.reducer

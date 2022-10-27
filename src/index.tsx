@@ -4,6 +4,7 @@ import './index.css';
 import App from './App';
 import { Provider } from 'react-redux';
 import { store } from './redux';
+import { ContextProvider } from './redux/socket/SocketProvider';
 
 
 const root = ReactDOM.createRoot(
@@ -12,7 +13,9 @@ const root = ReactDOM.createRoot(
 root.render(
   <React.StrictMode>
     <Provider store={store}>
+    <ContextProvider>
     <App />
+    </ContextProvider>
     </Provider>
   </React.StrictMode>
 );

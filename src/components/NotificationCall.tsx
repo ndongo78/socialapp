@@ -4,8 +4,8 @@ import {MdCallEnd} from "react-icons/md"
 import { SocketContext } from '../redux/socket/SocketProvider'
 import "../styles/Notifier.scss"
 
-const NotificationCall = () => {
-  const {call,callAccepted,answerCall}=useContext(SocketContext)
+const NotificationCall = ({answerCall}:any) => {
+  const {call,callAccepted,}=useContext(SocketContext)
   return (
     <div className='notifier' >
        <h4> {call.from?.username} vous appel </h4>

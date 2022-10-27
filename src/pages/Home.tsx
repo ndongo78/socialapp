@@ -10,7 +10,7 @@ import UserMessages from "../components/UserMessages";
 import CurrentChatUser from "../components/CurrentChatUser";
 import ChatInput from "../components/ChatInput";
 import { Navigate, useNavigate } from "react-router-dom";
-import { userState } from "../redux/slicers/userSlice";
+import { setCallAccept, userState } from "../redux/slicers/userSlice";
 import { useContext, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { conversationState, getMystream, getOnlineUsers, updateMsg } from "../redux/slicers/converMessageSlice";
@@ -23,15 +23,16 @@ import NotificationCall from "../components/NotificationCall";
 const SERVER:string | undefined |any =process.env.REACT_APP_SOCKECT_SERVER
 
 const Home = () => {
-    const {user,islogin }=useSelector(userState)
+    const {acceptedCall,islogin }=useSelector(userState)
     const {category,onlineUsers}=useSelector(conversationState)
-    const {call,callAccepted,isReceivingCall}=useContext(SocketContext)
+   
     const navigate=useNavigate()
     const [socketId, setsocketId] = useState("")
     const [newMessage, setnewMessage] = useState<any>()
     const dispatch=useDispatch()
-    let socket=useRef<any>()
-
+    const {callAccepted,callEnded,userVideo,myVideo,connectionRef,
+      setMyStream,mystream,call,setCallAccepted,socket,isReceivingCall
+    }=useContext(SocketContext)
    
 
    
@@ -43,15 +44,15 @@ const Home = () => {
      }
   }, [islogin])
 
-  // useEffect(()=>{
-  //   if(isReceivingCall){
-  //     alert("vous avez recu un appel")
-  //   }
-  // },[isReceivingCall])
+  useEffect(()=>{
+    if(isReceivingCall && !acceptedCall){
+      navigate("/videoCall")
+    }
+  },[isReceivingCall])
 
+  
+  
 
-
- console.log("newMessage",newMessage);
   
  const displayComponent=()=>{
    if(category ==="audioCall"){
@@ -69,10 +70,7 @@ const Home = () => {
   
   return (
     <>
-    {
-      isReceivingCall &&
-    <NotificationCall />
-    }
+   
     <div className="home contain">
       {/* <Drawer /> */}
       <div className="user">

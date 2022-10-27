@@ -24,7 +24,7 @@ const app=express()
 app.use(cors())
 
 
-app.get("/", (req,res)=>{
+app.use("/", (req,res)=>{
   res.send("welcome to node server")
 })
 
@@ -55,7 +55,10 @@ io.on("connection",socket=>{
     const userTo=onlineUser.find(user=>user._id === data.receiverId)
     // console.log("userTo: ",userTo)
     // console.log("sendMessage",data) 
-    socket.to(userTo.socketId).emit('messages',data) 
+    if(userTo){
+     socket.to(userTo.socketId).emit('messages',data)  
+    }
+    
   })
 
   
@@ -70,13 +73,17 @@ io.on("connection",socket=>{
   })
  
   socket.on("callUser", (data) => { 
-    const userTo=onlineUser.find(user=>user._id === data.userToCall._id)
-    //console.log("firstchar",userTo)
-    io.to(userTo.socketId).emit("callUser", { signal:data.signal, from:data.from });
+    if(data.userToCall){
+      const userTo=onlineUser.find(user=>user._id === data.userToCall._id)
+      console.log("firstchar",data)
+      if(userTo){
+        io.to(userTo.socketId).emit("callUser", { signal:data.signalData, from:data.from });
+      }
+    }
 });
 
 socket.on("answerCall", (data) => { 
     console.log("signal",data);
-    io.to(data.to).emit("callAccepted", data.signal)
+    io.to(data.to).emit("callAccepted", data)
 });
 })

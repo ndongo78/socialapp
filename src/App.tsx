@@ -7,7 +7,8 @@ import React, { ReactElement, ReactNode } from 'react';
 import Register from './pages/SignUp';
 import { useSelector } from 'react-redux';
 import { userState } from './redux/slicers/userSlice';
-import { ContextProvider } from './redux/socket/SocketProvider';
+import VideoCall from './components/VideoCall';
+
 
 function App() {
   const {user,islogin}=useSelector(userState)
@@ -19,16 +20,15 @@ function App() {
   }
   return (
     <BrowserRouter>
-      <ContextProvider>
     <Routes>
       <Route path="/" element={<Login />} />
         <Route
         path='/home'
           element={<Home />}/>
         <Route path="register" element={<Register />} />
-   
+        <Route path="videoCall" element={<VideoCall />} />
     </Routes>
-    </ContextProvider>
+    
   </BrowserRouter>
   );
 }
