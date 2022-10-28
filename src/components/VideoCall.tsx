@@ -11,7 +11,7 @@ import NotificationCall from './NotificationCall';
 
 const VideoCall = () => {
     const {conversations,userChat,messages}=useSelector(conversationState)
-    const {callAccepted,callEnded,myVideo,connectionRef,
+    const {callAccepted,callEnded,myVideo,connectionRef,answerCall,
       setMyStream,mystream,call,setCallAccepted,socket,isReceivingCall,setisReceivingCall
     }=useContext(SocketContext)
     const userVideo=useRef<any>()
@@ -27,33 +27,34 @@ const VideoCall = () => {
        }
     }, [islogin])
 
-    useEffect(() => {
-      navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-      .then((mediaStream) => {
-          setMyStream(mediaStream);
-          myVideo.current.srcObject = mediaStream;
-      }).catch(err => console.log("err: ", err));
+    // useEffect(() => {
+    //   navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+    //   .then((mediaStream) => {
+    //       setMyStream(mediaStream);
+    //       myVideo.current.srcObject = mediaStream;
+    //   }).catch(err => console.log("err: ", err));
       
-    }, [])
-    const answerCall = () => {
-      setisReceivingCall(false)
-      dispatch(setCallAccept())
-      setCallAccepted(true);
-      const peer = new Peer({ initiator: false, trickle: false, stream:mystream });
-      peer.on('signal', (data) => {
-          socket.current.emit('answerCall', { signal: data, to: call.from });
-        });
-        peer.on('stream', (currentStream) => {
-            userVideo.current.srcObject = currentStream;
-        });
-        console.log("call.signal",call.signal)
-        peer.signal(call.signal);
-        connectionRef.current = peer;
-  };
+    // }, [])
+
+
+  //   const answerCall = () => {
+  //     setisReceivingCall(false)
+  //     dispatch(setCallAccept())
+  //     setCallAccepted(true);
+  //     const peer = new Peer();
+  //     peer.on('signal', (data) => {
+  //         socket.current.emit('answerCall', { signal: data, to: call.from });
+  //       });
+  //       peer.on('stream', (currentStream) => {
+  //           userVideo.current.srcObject = currentStream;
+  //       });
+  //       console.log("call.signal",call.signal)
+  //       peer.signal(call.signal);
+  //       connectionRef.current = peer;
+  // };
    
 
-    console.log("userVideo",userVideo)
-    console.log("callAccepted",acceptedCall)
+   
   
   return (
 <>
@@ -68,18 +69,15 @@ const VideoCall = () => {
     <p>Appel en cour</p>
   </div>
   <div className=' flex'>
-    <div className=" bg-red-500">
-    {
-    myVideo &&
+    <div className=" ">
+   
     <video playsInline  ref={myVideo}  autoPlay className="video" />
-    }
+    
     </div>
-   {
-      callAccepted && !callEnded &&
-   <div className=' bg-yellow-50'>
+   <div className=''>
     <video playsInline  ref={userVideo}  autoPlay className="video" />
    </div>
-   }
+   
   </div>
   
   

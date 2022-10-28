@@ -1,6 +1,6 @@
 import React, { createContext, useState, useRef, useEffect } from 'react';
 import { io } from 'socket.io-client';
-import Peer from 'simple-peer';
+import Peer from 'peerjs';
 import { useDispatch, useSelector } from 'react-redux';
 import { setCurrentUser, userState } from '../slicers/userSlice';
 import { conversationState, getOnlineUsers, updateMsg } from '../slicers/converMessageSlice';
@@ -93,44 +93,46 @@ const ContextProvider = ({ children }:any) => {
     const dispatch = useDispatch()
 
 
-    useEffect(() => {
-      navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-      .then((mediaStream) => {
-         // console.log("currentStream",mediaStream)
-          setMyStream(mediaStream);
-          myVideo.current.srcObject = mediaStream;
+    // useEffect(() => {
+    //   navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+    //   .then((mediaStream) => {
+    //      // console.log("currentStream",mediaStream)
+    //       setMyStream(mediaStream);
+    //       myVideo.current.srcObject = mediaStream;
           
-      }).catch(err => console.log("err: ", err));
+    //   }).catch(err => console.log("err: ", err));
      
-    }, [])
+    // }, [])
     
     useEffect(() => {
         if(islogin){
-          //  peer.current = new Peer( {
-          //   path: '/',
-          //   //host: "192.168.1.12",
-          //  // host:"https://chabackendapi.herokuapp.comnnn",
-          //   //port:5000,
-          //   secure: true,
-          //   config: {
-          //     iceServers: [
-          //       {
-          //         urls: [
-          //           'stun:stun1.l.google.com:19302',
-          //           'stun:stun2.l.google.com:19302',
-          //         ],
-          //       },
-          //     ],
-          //   },
-          // });
+           peer.current = new Peer( {
+            path: '/',
+            //host: "192.168.1.12",
+           // host:"https://chabackendapi.herokuapp.comnnn",
+            //port:5000,
+            secure: true,
+            config: {
+              iceServers: [
+                {
+                  urls: [
+                    'stun:stun1.l.google.com:19302',
+                    'stun:stun2.l.google.com:19302',
+                  ],
+                },
+              ],
+            },
+          });
          socket.current=io(SERVER)
          socket.current.on("connection",(data:string)=>{
            console.log("on connection",data)
-           setsocketId(socketId)
-           dispatch(setCurrentUser({...user,socketId:data}))
-            socket.current.emit("register-new-user",{...user,socketId:data})
+           peer.current.on('open',(peerId: string)=>{
+            console.log("peerId",peerId)
+            setsocketId(socketId)
+            dispatch(setCurrentUser({...user,socketId:data}))
+             socket.current.emit("register-new-user",{...user,socketId:data,peerId:peerId})
+           })
          })
-         
          socket.current.on('user-connected',(users:any)=>{
            dispatch(getOnlineUsers(users))
         })
@@ -154,50 +156,70 @@ const ContextProvider = ({ children }:any) => {
        setuserCall(data.from)
        setCall({ signal:data.signal, from:data.from });
    });
-      
+   navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+   .then((mediaStream) => {
+      // console.log("currentStream",mediaStream)
+       //setMyStream(mediaStream);
+       myVideo.current.srcObject = mediaStream;
+       peer.current.on("call",(call)=>{
+         //setCurrentCall(call)
+         call.answer(mediaStream)
+         try {
+           call.on("stream",(remoteStream: any)=>{
+             userVideo.current.srcObject=remoteStream
+           })
+         } catch (error) {
+           console.log("call error", error);
+          return alert("Error calling")
+         }
+         console.log("callEvent",call)
+       })
+       
+   }).catch(err => console.log("err: ", err));
      }
      }, [islogin])
 
-     const answerCall = () => {
-      setCallAccepted(true);
+  //    const answerCall = () => {
+  //     setCallAccepted(true);
 
-      const peer = new Peer({ initiator: false, trickle: false, stream:mystream });
+  //     const peer = new Peer({ initiator: false, trickle: false, stream:mystream });
 
-      peer.on('signal', (data) => {
-          socket.current.emit('answerCall', { signal: data, to: call.from });
-        });
-        peer.on('stream', (currentStream) => {
+  //     peer.on('signal', (data) => {
+  //         socket.current.emit('answerCall', { signal: data, to: call.from });
+  //       });
+  //       peer.on('stream', (currentStream) => {
           
-            //userVideo.current.srcObject = currentStream;
-        });
-        console.log("call.signal",call.signal)
-        peer.signal(call.signal);
+  //           //userVideo.current.srcObject = currentStream;
+  //       });
+  //       console.log("call.signal",call.signal)
+  //       peer.signal(call.signal);
   
   
-        connectionRef.current = peer;
+  //       connectionRef.current = peer;
 
-  };
+  // };
 
-  const callUser = () => {
-      const peer = new Peer({ initiator: true, trickle: false, stream:mystream });
+  // const callUser = () => {
+  //     const peer = new Peer({ initiator: true, trickle: false, stream:mystream });
 
-      peer.on('signal', (data) => {
-        console.log("signal",data);
-          socket.current.emit('callUser',  { userToCall: userChat, signalData: data, from: user });
-      });
+  //     peer.on('signal', (data) => {
+  //       //console.log("signal",data);
+  //         socket.current.emit('callUser',  { userToCall: userChat, signalData: data, from: user });
+  //     });
+  //     console.log("callUser stream1",userVideo.current);
+  //     peer.on('stream', (currentStream) => {
+  //       console.log("callUser stream",userVideo.current);
+  //         userVideo.current.srcObject = currentStream;
+  //     });
 
-      peer.on('stream', (currentStream) => {
-          userVideo.current.srcObject = currentStream;
-      });
+  //     socket.current.on('callAccepted', (signal) => {
+  //         console.log("signal accepted", signal);
+  //         setCallAccepted(true);
 
-      socket.current.on('callAccepted', (signal) => {
-          console.log("signal accepted", signal);
-          setCallAccepted(true);
-
-          peer.signal(signal);
-      });
-      connectionRef.current = peer;
-  };
+  //         peer.signal(signal);
+  //     });
+  //     connectionRef.current = peer;
+  // };
 
   //  useEffect(()=>{
   //   if(peer.current){
@@ -205,7 +227,6 @@ const ContextProvider = ({ children }:any) => {
   //       setCurrentCall(call)
   //       try {
   //         call.on("stream",(remoteStream: any)=>{
-           
   //           userVideo.current.srcObject=remoteStream
   //         })
   //       } catch (error) {
@@ -218,83 +239,77 @@ const ContextProvider = ({ children }:any) => {
   //  },[peer])
 
 
-    // const answerCall = () => {
-    //     setCallAccepted(true);
-    //     setisReceivingCall(false)
-    //   // currentCall.answer(mystream)
-    //   // peer.current.on("call",(call)=>{
-    //   //   setCurrentCall(call)
-    //   //   call.answer(mystream)
-    //   //   try {
-    //   //     call.on("stream",(remoteStream: any)=>{
-           
-    //   //       userVideo.current.srcObject=remoteStream
-    //   //     })
-    //   //   } catch (error) {
-    //   //     console.log("call error", error);
-    //   //    return alert("Error calling")
-    //   //   }
-    //   //   console.log("callEvent",call)
-    //   // })
-        
-    //     const peer = new Peer({ initiator: false,trickle:false, stream:mystream });
-    //     //console.log("stream received",mystream);
-    //     peer.on('error', (error) => {
+    const answerCall = () => {
+        setCallAccepted(true);
+        setisReceivingCall(false)
+     // currentCall.answer(mystream)
+      navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+      .then((mediaStream) => {
+         // console.log("currentStream",mediaStream)
+          //setMyStream(mediaStream);
+          myVideo.current.srcObject = mediaStream;
+          peer.current.on("call",(call)=>{
+            //setCurrentCall(call)
+            call.answer(mediaStream)
+            try {
+              call.on("stream",(remoteStream: any)=>{
+                userVideo.current.srcObject=remoteStream
+              })
+            } catch (error) {
+              console.log("call error", error);
+             return alert("Error calling")
+            }
+            console.log("callEvent",call)
+          })
           
-    //       console.error('peer error', error)
-    //     })
-    //     peer.on('signal', (data) => {
-    //         console.log("stream received data",data);
-    //         socket.current.emit('answerCall', { signal: data, to: call.from });
-    //     });
-    //     // console.log("stream received","avva")
-    //     // peer.on('stream', (currentStream) => {
-    //     //  console.log("stream received",currentStream)
-    //     //     userVideo.current.srcObject = currentStream;
-    //     // }); 
-    //     // peer.signal(call.signal);
-    //     // console.log(call);
-
-    //     // connectionRef.current = peer;
-    // };
-
-    // const callUser = async() => {
+      }).catch(err => console.log("err: ", err));
       
-    //     //   const remoteUser=onlineUsers.find((user: { _id: string; }) => user._id ===userChat._id);
+    };
 
-    //     //  if(remoteUser && !remoteUser.peerId){
-    //     //  return alert(`${userChat.username} n'est pas connecter`)
-    //     //  }
-    //     //      //setStream(currentStream);
-    //     //      socket.current.emit('callUser', { userToCall: remoteUser,from: user });
-    //     //      var call=peer.current.call(remoteUser.peerId,mystream)
-    //     //      try {
-    //     //       call.on("stream",(remoteStream)=>{
-    //     //         userVideo.current.srcObject=remoteStream
-    //     //       })
-    //     //      } catch (error) {
-    //     //       console.log("call failed", error)
-    //     //       return alert("Une erreur est survenue")
-    //     //      }
+    const callUser = async() => {
+          const remoteUser=onlineUsers.find((user: { _id: string; }) => user._id ===userChat._id);
+         if(remoteUser && !remoteUser.peerId){
+         return alert(`${userChat.username} n'est pas connecter`)
+         }
+             //setStream(currentStream);
+             navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+             .then((mediaStream) => {
+                // console.log("currentStream",mediaStream)
+                 //setMyStream(mediaStream);
+                 myVideo.current.srcObject = mediaStream;
+                 socket.current.emit('callUser', { userToCall: remoteUser,from: user });
+                 try {
+                   var call=peer.current.call(remoteUser.peerId,mediaStream)
+                  call.on("stream",(remoteStream)=>{
+                    userVideo.current.srcObject=remoteStream
+                  })
+                 } catch (error) {
+                  console.log("call failed", error)
+                  return alert("Une erreur est survenue")
+                 }
+                 
+             }).catch(err => console.log("err: ", err));
+             
+            
 
-    //         //  myVideo.current.srcObject = currentStream;
+            //  myVideo.current.srcObject = currentStream;
          
         
         
-    //      const peer = new Peer({ initiator: true, trickle: false, stream:mystream });
-    //     peer.on('signal', (data) => {
-    //         console.log("signal", data);
-    //         socket.current.emit('callUser', { userToCall: userChat, signalData: data, from: user });
-    //     });
-    //     peer.on('stream', (currentStream) => {
-    //         userVideo.current.srcObject = currentStream;
-    //     });
-    //     socket.current.on('callAccepted', (signal:any) => {
-    //         setCallAccepted(true);
-    //         peer.signal(signal);
-    //     });
-    //     connectionRef.current = peer;
-    // };
+        //  const peer = new Peer({ initiator: true, trickle: false, stream:mystream });
+        // peer.on('signal', (data) => {
+        //     console.log("signal", data);
+        //     socket.current.emit('callUser', { userToCall: userChat, signalData: data, from: user });
+        // });
+        // peer.on('stream', (currentStream) => {
+        //     userVideo.current.srcObject = currentStream;
+        // });
+        // socket.current.on('callAccepted', (signal:any) => {
+        //     setCallAccepted(true);
+        //     peer.signal(signal);
+        // });
+        // connectionRef.current = peer;
+    };
 
     const leaveCall = () => {
         setCallEnded(true);
