@@ -1,62 +1,33 @@
-import React, { useContext, useEffect, useRef, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux';
+import { useContext, useEffect, useRef } from 'react'
+import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { conversationState, getMystream, setCategory } from '../redux/slicers/converMessageSlice';
+import { conversationState } from '../redux/slicers/converMessageSlice';
 import "../styles/Video.scss"
 import {ImPhoneHangUp} from 'react-icons/im'
 import { SocketContext } from '../redux/socket/SocketProvider';
-import Peer from "simple-peer"
-import { setCallAccept, userState } from '../redux/slicers/userSlice';
+import { userState } from '../redux/slicers/userSlice';
 import NotificationCall from './NotificationCall';
 
 const VideoCall = () => {
-    const {conversations,userChat,messages}=useSelector(conversationState)
-    const {callAccepted,callEnded,myVideo,connectionRef,answerCall,
-      setMyStream,mystream,call,setCallAccepted,socket,isReceivingCall,setisReceivingCall
-    }=useContext(SocketContext)
+    const {userChat}=useSelector(conversationState)
+    const {myVideo,
+      isReceivingCall , answerCall    }=useContext(SocketContext)
     const userVideo=useRef<any>()
-   const {acceptedCall ,islogin}=useSelector(userState)
-   
-    const dispatch =useDispatch()
-    const [isIn, setisIn] = useState(false)
+   const {islogin}=useSelector(userState)
+
     const navigate=useNavigate()
-    //  console.log("conversations",conversations.room[0]._id)
     useEffect(() => {
       if (!islogin) {
         navigate("/")
        }
     }, [islogin])
 
-    // useEffect(() => {
-    //   navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-    //   .then((mediaStream) => {
-    //       setMyStream(mediaStream);
-    //       myVideo.current.srcObject = mediaStream;
-    //   }).catch(err => console.log("err: ", err));
-      
-    // }, [])
 
 
-  //   const answerCall = () => {
-  //     setisReceivingCall(false)
-  //     dispatch(setCallAccept())
-  //     setCallAccepted(true);
-  //     const peer = new Peer();
-  //     peer.on('signal', (data) => {
-  //         socket.current.emit('answerCall', { signal: data, to: call.from });
-  //       });
-  //       peer.on('stream', (currentStream) => {
-  //           userVideo.current.srcObject = currentStream;
-  //       });
-  //       console.log("call.signal",call.signal)
-  //       peer.signal(call.signal);
-  //       connectionRef.current = peer;
-  // };
-   
-
+  
    
   
-  return (
+return (
 <>
 <div className="modale"
   >

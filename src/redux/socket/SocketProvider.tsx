@@ -103,81 +103,116 @@ const ContextProvider = ({ children }:any) => {
     //   }).catch(err => console.log("err: ", err));
      
     // }, [])
-    
     useEffect(() => {
-        if(islogin){
-           peer.current = new Peer( {
-            path: '/',
-            //host: "192.168.1.12",
-           // host:"https://chabackendapi.herokuapp.comnnn",
-            //port:5000,
-            secure: true,
-            config: {
-              iceServers: [
-                {
-                  urls: [
-                    'stun:stun1.l.google.com:19302',
-                    'stun:stun2.l.google.com:19302',
-                  ],
-                },
-              ],
-            },
+      if (islogin) {
+        const peerOptions = {
+          path: '/',
+          secure: true,
+          config: {
+            iceServers: [
+              {
+                urls: [
+                  'stun:stun1.l.google.com:19302',
+                  'stun:stun2.l.google.com:19302',
+                ],
+              },
+            ],
+          },
+        };
+    
+        peer.current = new Peer(peerOptions);
+    
+        socket.current = io(SERVER);
+    
+        socket.current.on("connection", (data: string) => {
+          peer.current.on('open', (peerId: string) => {
+            setsocketId(peerId);
+            dispatch(setCurrentUser({ ...user, socketId: data }));
+            socket.current.emit("register-new-user", { ...user, socketId: data, peerId: peerId });
           });
-         socket.current=io(SERVER)
-         socket.current.on("connection",(data:string)=>{
-           console.log("on connection",data)
-           peer.current.on('open',(peerId: string)=>{
-            console.log("peerId",peerId)
-            setsocketId(socketId)
-            dispatch(setCurrentUser({...user,socketId:data}))
-             socket.current.emit("register-new-user",{...user,socketId:data,peerId:peerId})
-           })
-         })
-         socket.current.on('user-connected',(users:any)=>{
-           dispatch(getOnlineUsers(users))
-        })
-        // peer.current.on('error', (err: Error) =>
-        //   console.log('Peer server error', err),
-        // );
+        });
+    
+        socket.current.on('user-connected', (users: any) => {
+          dispatch(getOnlineUsers(users));
+        });
+    
+        peer.current.on('error', (err: Error) =>
+          console.log('Erreur du serveur Peer', err),
+        );
+    
+        socket.current.on("messages", (data: any) => {
+          dispatch(updateMsg(data));
+        });
+    
+        socket.current.on("disconnect", () => {
+          socket.current.on('getUsers', (users: any) => {
+            dispatch(getOnlineUsers(users));
+          });
+        });
+    
+        socket.current.on('callUser', (data: any) => {
+          setisReceivingCall(true);
+          setuserCall(data.from);
+          setCall({ signal: data.signal, from: data.from });
+        });
+      }
+    }, [islogin]);
+    
+    
+  //   useEffect(() => {
+  //       if(islogin){
+  //          peer.current = new Peer( {
+  //           path: '/',
+  //           //host: "192.168.1.12",
+  //          // host:"https://chabackendapi.herokuapp.comnnn",
+  //           //port:5000,
+  //           secure: true,
+  //           config: {
+  //             iceServers: [
+  //               {
+  //                 urls: [
+  //                   'stun:stun1.l.google.com:19302',
+  //                   'stun:stun2.l.google.com:19302',
+  //                 ],
+  //               },
+  //             ],
+  //           },
+  //         });
+          
+  //        socket.current=io(SERVER)
+  //        socket.current.on("connection",(data:string)=>{
+          
+  //          peer.current.on('open',(peerId: string)=>{
+  //          console.log("socketId",socketId)
+  //           setsocketId(socketId)
+  //           dispatch(setCurrentUser({...user,socketId:data}))
+  //            socket.current.emit("register-new-user",{...user,socketId:data,peerId:peerId})
+  //          })
+  //        })
+  //        socket.current.on('user-connected',(users:any)=>{
+  //          dispatch(getOnlineUsers(users))
+  //       })
+  //       peer.current.on('error', (err: Error) =>
+  //         console.log('Peer server error', err),
+  //       );
    
-        socket.current.on("messages",(data:any)=>{
-         console.log("messages",data)
-         dispatch(updateMsg(data)) 
-         //setnewMessage(data)
-       })
-       socket.current.on("disconnect",()=>{
-         socket.current.on('getUsers',(users:any)=>{
-           dispatch(getOnlineUsers(users))
-         })
-       })
-       socket.current.on('callUser', (data:any) => {
-        console.log("callUser",data)
-       setisReceivingCall(true)
-       setuserCall(data.from)
-       setCall({ signal:data.signal, from:data.from });
-   });
-   navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-   .then((mediaStream) => {
-      // console.log("currentStream",mediaStream)
-       //setMyStream(mediaStream);
-       myVideo.current.srcObject = mediaStream;
-       peer.current.on("call",(call)=>{
-         //setCurrentCall(call)
-         call.answer(mediaStream)
-         try {
-           call.on("stream",(remoteStream: any)=>{
-             userVideo.current.srcObject=remoteStream
-           })
-         } catch (error) {
-           console.log("call error", error);
-          return alert("Error calling")
-         }
-         console.log("callEvent",call)
-       })
-       
-   }).catch(err => console.log("err: ", err));
-     }
-     }, [islogin])
+  //       socket.current.on("messages",(data:any)=>{
+  //        dispatch(updateMsg(data)) 
+  //        //setnewMessage(data)
+  //      })
+  //      socket.current.on("disconnect",()=>{
+  //        socket.current.on('getUsers',(users:any)=>{
+  //          dispatch(getOnlineUsers(users))
+  //        })
+  //      })
+  //      socket.current.on('callUser', (data:any) => {
+  //       //console.log("callUser",data)
+  //      setisReceivingCall(true)
+  //      setuserCall(data.from)
+  //      setCall({ signal:data.signal, from:data.from });
+  //  });
+  //    }
+  //    }, [islogin])
 
   //    const answerCall = () => {
   //     setCallAccepted(true);
@@ -237,64 +272,105 @@ const ContextProvider = ({ children }:any) => {
   //     })
   //   }
   //  },[peer])
+  const callUser = async () => {
+    try {
+      const remoteUser = onlineUsers.find((user: { _id: string }) => user._id === userChat._id);
+  
+      if (remoteUser && !remoteUser.peerId) {
+        return alert(`${userChat.username} n'est pas connecté`);
+      }
+  
+      const mediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      myVideo.current.srcObject = mediaStream;
+  
+      const call = peer.current.call(remoteUser.peerId, mediaStream);
+  
+      call.on("stream", (remoteStream: any) => {
+        userVideo.current.srcObject = remoteStream;
+      });
+  
+      socket.current.emit('callUser', { userToCall: remoteUser, from: user });
+    } catch (error) {
+      console.log("Erreur lors de l'appel", error);
+      alert("Une erreur est survenue lors de l'appel");
+    }
+  };
+  
+  const answerCall = async () => {
+    try {
+      setCallAccepted(true);
+      setisReceivingCall(false);
+  
+      const mediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      myVideo.current.srcObject = mediaStream;
+  
+      currentCall.answer(mediaStream);
+  
+      currentCall.on("stream", (remoteStream: any) => {
+        userVideo.current.srcObject = remoteStream;
+      });
+  
+      currentCall.on("close", () => {
+        setCallEnded(true);
+      });
+    } catch (error) {
+      console.log("Erreur lors de la réponse à l'appel", error);
+      alert("Une erreur est survenue lors de la réponse à l'appel");
+    }
+  };
+  
 
+    // const answerCall = () => {
+    //     setCallAccepted(true);
+    //     setisReceivingCall(false)
+    //  // currentCall.answer(mystream)
+    //   navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+    //   .then((mediaStream) => {
+    //       myVideo.current.srcObject = mediaStream;
+    //       peer.current.on("call",(call)=>{
+    //         //setCurrentCall(call)
+    //         call.answer(mediaStream)
+    //         try {
+    //           call.on("stream",(remoteStream: any)=>{
+    //             userVideo.current.srcObject=remoteStream
+    //           })
+    //         } catch (error) {
+    //           console.log("call error", error);
+    //          return alert("Error calling")
+    //         }
+    //         console.log("callEvent",call)
+    //       })
+    //   }).catch(err => console.log("err: ", err));
+    // };
 
-    const answerCall = () => {
-        setCallAccepted(true);
-        setisReceivingCall(false)
-     // currentCall.answer(mystream)
-      navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-      .then((mediaStream) => {
-         // console.log("currentStream",mediaStream)
-          //setMyStream(mediaStream);
-          myVideo.current.srcObject = mediaStream;
-          peer.current.on("call",(call)=>{
-            //setCurrentCall(call)
-            call.answer(mediaStream)
-            try {
-              call.on("stream",(remoteStream: any)=>{
-                userVideo.current.srcObject=remoteStream
-              })
-            } catch (error) {
-              console.log("call error", error);
-             return alert("Error calling")
-            }
-            console.log("callEvent",call)
-          })
-          
-      }).catch(err => console.log("err: ", err));
-      
-    };
-
-    const callUser = async() => {
-          const remoteUser=onlineUsers.find((user: { _id: string; }) => user._id ===userChat._id);
-         if(remoteUser && !remoteUser.peerId){
-         return alert(`${userChat.username} n'est pas connecter`)
-         }
-             //setStream(currentStream);
-             navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-             .then((mediaStream) => {
-                // console.log("currentStream",mediaStream)
-                 //setMyStream(mediaStream);
-                 myVideo.current.srcObject = mediaStream;
-                 socket.current.emit('callUser', { userToCall: remoteUser,from: user });
-                 try {
-                   var call=peer.current.call(remoteUser.peerId,mediaStream)
-                  call.on("stream",(remoteStream)=>{
-                    userVideo.current.srcObject=remoteStream
-                  })
-                 } catch (error) {
-                  console.log("call failed", error)
-                  return alert("Une erreur est survenue")
-                 }
-                 
-             }).catch(err => console.log("err: ", err));
+    // const callUser = async() => {
+    //       const remoteUser=onlineUsers.find((user: { _id: string; }) => user._id ===userChat._id);
+    //      if(remoteUser && !remoteUser.peerId){
+    //      return alert(`${userChat.username} n'est pas connecter`)
+    //      }
+    //          //setStream(currentStream);
+    //          navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+    //          .then((mediaStream) => {
+    //             // console.log("currentStream",mediaStream)
+    //              //setMyStream(mediaStream);
+    //              myVideo.current.srcObject = mediaStream;
+    //              socket.current.emit('callUser', { userToCall: remoteUser,from: user });
+    //              try {
+    //                var call=peer.current.call(remoteUser.peerId,mediaStream)
+    //               call.on("stream",(remoteStream)=>{
+    //                 userVideo.current.srcObject=remoteStream
+    //               })
+    //              } catch (error) {
+    //               console.log("call failed", error)
+    //               return alert("Une erreur est survenue")
+    //              }
+    //          }).catch(err => console.log("err: ", err));
              
             
 
-            //  myVideo.current.srcObject = currentStream;
+    //         //  myVideo.current.srcObject = currentStream;
          
-        
+    //     // };
         
         //  const peer = new Peer({ initiator: true, trickle: false, stream:mystream });
         // peer.on('signal', (data) => {
@@ -309,7 +385,7 @@ const ContextProvider = ({ children }:any) => {
         //     peer.signal(signal);
         // });
         // connectionRef.current = peer;
-    };
+   
 
     const leaveCall = () => {
         setCallEnded(true);
